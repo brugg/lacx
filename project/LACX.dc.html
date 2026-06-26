@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LACX — Amarre. Conecte. Vá.</title>
+  <style>
+    :root {
+      --bg: #0A0A0A;
+      --bg2: #0F0F0F;
+      --bg3: #141414;
+      --border: #1C1C1C;
+      --border2: #282828;
+      --text: #FFFFFF;
+      --text2: #7A7A7A;
+      --text3: #3A3A3A;
+      --accent: #00BFFF;
+      --accent-dim: rgba(0,191,255,0.07);
+      --accent-glow: rgba(0,191,255,0.3);
+    }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+    @keyframes glowPulse { 0%,100%{opacity:.12;filter:blur(90px)} 50%{opacity:.22;filter:blur(110px)} }
+    @keyframes ledBlink { 0%,78%,100%{opacity:1} 82%{opacity:.1} 86%{opacity:.9} 90%{opacity:.1} 94%{opacity:1} }
+    @keyframes shimmer { from{transform:translateX(-150%) skewX(-20deg)} to{transform:translateX(300%) skewX(-20deg)} }
+    @keyframes scanMove { 0%{top:-2px;opacity:0} 3%{opacity:.35} 97%{opacity:.35} 100%{top:100%;opacity:0} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes borderGlow { 0%,100%{box-shadow:0 0 0 rgba(0,191,255,0)} 50%{box-shadow:0 0 30px rgba(0,191,255,.15)} }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',-apple-system,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    ::selection{background:rgba(0,191,255,.25)}
+    ::-webkit-scrollbar{width:2px;background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:rgba(0,191,255,.3)}
+
+    .nav-solid{background:rgba(10,10,10,.94)!important;backdrop-filter:blur(24px) saturate(180%)!important;border-bottom:1px solid var(--border)!important}
+
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+    .reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}.reveal.d3{transition-delay:.24s}
+    .reveal.d4{transition-delay:.32s}.reveal.d5{transition-delay:.40s}.reveal.d6{transition-delay:.48s}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+
+    a.nav-lnk{color:rgba(255,255,255,.55);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.4px;transition:color .2s;white-space:nowrap}
+    a.nav-lnk:hover{color:#fff}
+
+    .btn-cta{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#000;font-size:13px;font-weight:700;letter-spacing:1.5px;padding:14px 30px;border-radius:4px;cursor:pointer;border:none;font-family:inherit;transition:all .25s;position:relative;overflow:hidden;text-transform:uppercase}
+    .btn-cta::after{content:'';position:absolute;top:0;left:-60%;width:35%;height:100%;background:rgba(255,255,255,.35);transform:skewX(-20deg)}
+    .btn-cta:hover{background:#1ACFFF;box-shadow:0 0 50px rgba(0,191,255,.45),0 8px 24px rgba(0,0,0,.5)}
+    .btn-cta:hover::after{animation:shimmer .5s ease-in-out}
+
+    .btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:rgba(255,255,255,.65);font-size:13px;font-weight:500;letter-spacing:.5px;padding:14px 24px;border-radius:4px;cursor:pointer;border:1px solid var(--border2);transition:all .25s;font-family:inherit}
+    .btn-ghost:hover{color:#fff;border-color:rgba(0,191,255,.45);background:var(--accent-dim)}
+
+    .tech-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:28px 24px 26px;transition:all .3s;position:relative;overflow:hidden}
+    .tech-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,191,255,.4),transparent);opacity:0;transition:opacity .3s}
+    .tech-card:hover{border-color:rgba(0,191,255,.28);transform:translateY(-4px);background:#181820}
+    .tech-card:hover::after{opacity:1}
+
+    .perf-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:32px 28px;transition:all .3s}
+    .perf-card:hover{border-color:rgba(0,191,255,.25);background:#181820;transform:translateY(-3px)}
+
+    .size-btn{width:52px;height:46px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;border-radius:4px;font-family:inherit}
+    .size-btn:hover{border-color:rgba(0,191,255,.5);color:#fff}
+    .size-btn.sz-active{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+
+    .model-card{border:1px solid var(--border);border-radius:10px;padding:24px;cursor:pointer;transition:all .3s;background:var(--bg3)}
+    .model-card:hover{border-color:rgba(0,191,255,.3)}
+    .model-card.mc-active{border-color:var(--accent);background:rgba(0,191,255,.055);box-shadow:0 0 40px rgba(0,191,255,.1),inset 0 0 30px rgba(0,191,255,.04)}
+
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border:1px solid var(--border2);border-radius:100px;font-size:13px;font-weight:500;color:var(--text2);transition:all .25s;white-space:nowrap}
+    .chip:hover{color:#fff;border-color:rgba(0,191,255,.4);background:var(--accent-dim)}
+
+    .step-num{font-size:72px;font-weight:700;line-height:1;color:transparent;-webkit-text-stroke:1.5px rgba(0,191,255,.5);letter-spacing:-3px}
+
+    .badge-pill{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border:1px solid var(--border2);border-radius:100px;font-size:12px;font-weight:500;color:var(--text2)}
+
+    @media(max-width:768px){
+      .hide-mobile{display:none!important}
+      .hero-cols{flex-direction:column!important}
+      .hero-text{padding:0 24px!important;padding-top:100px!important}
+      .section-inner{padding:80px 24px!important}
+      .tech-grid{grid-template-columns:1fr!important}
+      .steps-row{flex-direction:column!important;gap:40px!important;align-items:flex-start!important}
+      .step-connector{display:none!important}
+      .models-row{flex-direction:column!important}
+      .app-cols{flex-direction:column!important;align-items:center!important}
+    }
+  </style>
+</helmet>
+
+<!-- ═══════════════════ NAV ═══════════════════ -->
+<nav id="lacx-nav" style="position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 60px;height:72px;display:flex;align-items:center;justify-content:space-between;background:transparent;transition:background .4s,border .4s,backdrop-filter .4s;border-bottom:1px solid transparent">
+  <div style="display:flex;align-items:center;gap:10px">
+    <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 3 L20 19.5 L36 3 L40 7 L24.5 20.5 L40 37 L36 40 L20 23 L4 40 L0 37 L15.5 20.5 L0 7 Z" fill="white"/>
+    </svg>
+    <span style="font-size:18px;font-weight:700;letter-spacing:4px;margin-left:2px">LACX</span>
+  </div>
+  <div class="hide-mobile" style="display:flex;align-items:center;gap:36px">
+    <a href="#tecnologia" class="nav-lnk">Tecnologia</a>
+    <a href="#como-funciona" class="nav-lnk">Como Funciona</a>
+    <a href="#app" class="nav-lnk">App</a>
+    <a href="#performance" class="nav-lnk">Performance</a>
+  </div>
+  <a href="#comprar">
+    <button class="btn-cta" style="padding:10px 22px;font-size:12px">Pré-venda →</button>
+  </a>
+</nav>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section id="hero" style="position:relative;min-height:100vh;overflow:hidden;display:flex;align-items:center;background:#0A0A0A">
+
+  <!-- Background grid lines -->
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:80px 80px;pointer-events:none"></div>
+
+  <!-- Blue glow orbs -->
+  <div style="position:absolute;width:600px;height:500px;background:#00BFFF;border-radius:50%;right:-5%;top:10%;animation:glowPulse 5s ease-in-out infinite;pointer-events:none"></div>
+  <div style="position:absolute;width:300px;height:300px;background:#0060FF;border-radius:50%;right:20%;bottom:15%;animation:glowPulse 6s ease-in-out infinite 1s;pointer-events:none"></div>
+
+  <!-- Shoe image from brand material -->
+  <div style="position:absolute;right:0;top:0;width:58%;height:100%;overflow:hidden;pointer-events:none">
+    <div style="position:absolute;inset:0;background-image:url('./uploads/gemini-2.5-flash-image_I_want_better_quality_images_from_those_tenis_to_use_in_the_website_I_m_creating-0.jpg');background-size:cover;background-position:center center;background-repeat:no-repeat;animation:float 5s ease-in-out infinite"></div>
+    <!-- Left fade -->
+    <div style="position:absolute;inset:0;background:linear-gradient(to right,#0A0A0A 0%,rgba(10,10,10,.7) 18%,rgba(10,10,10,.2) 35%,transparent 55%);pointer-events:none"></div>
+    <!-- Bottom fade -->
+    <div style="position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(transparent,#0A0A0A);pointer-events:none"></div>
+    <!-- Top fade -->
+    <div style="position:absolute;top:0;left:0;right:0;height:18%;background:linear-gradient(#0A0A0A,transparent);pointer-events:none"></div>
+    <!-- LED strip on shoe sole -->
+    <div style="position:absolute;bottom:31%;right:12%;width:200px;height:4px;background:#00BFFF;border-radius:2px;box-shadow:0 0 18px #00BFFF,0 0 36px rgba(0,191,255,.5),0 0 60px rgba(0,191,255,.25);animation:ledBlink 5s ease-in-out infinite"></div>
+    <!-- Scan line effect -->
+    <div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,191,255,.4),transparent);animation:scanMove 6s linear infinite 2s"></div>
+  </div>
+
+  <!-- Hero text content -->
+  <div class="hero-text" style="position:relative;z-index:2;max-width:620px;padding:0 0 0 80px;padding-top:72px">
+    <!-- Pre-sale badge -->
+    <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid rgba(0,191,255,.35);border-radius:100px;margin-bottom:40px;background:rgba(0,191,255,.06)">
+      <div style="width:6px;height:6px;border-radius:50%;background:#00BFFF;box-shadow:0 0 8px #00BFFF;animation:ledBlink 3s ease-in-out infinite"></div>
+      <span style="font-size:11px;font-weight:600;letter-spacing:2.5px;color:#00BFFF">PRÉ-VENDA EXCLUSIVA</span>
+    </div>
+
+    <!-- Headline -->
+    <h1 style="font-size:clamp(56px,7vw,92px);font-weight:700;line-height:1.0;letter-spacing:-3px;margin-bottom:28px;text-wrap:pretty">
+      AMARRE.<br>
+      CONECTE.<br>
+      <span style="color:#00BFFF">VÁ.</span>
+    </h1>
+
+    <p style="font-size:17px;font-weight:300;line-height:1.75;color:rgba(255,255,255,.6);max-width:420px;margin-bottom:48px">
+      O primeiro tênis com sistema de amarração automática adaptativa do mundo. Tecnologia de IA que aprende com cada passo.
+    </p>
+
+    <!-- CTAs -->
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:56px;flex-wrap:wrap">
+      <a href="#comprar">
+        <button class="btn-cta">Garantir o meu →</button>
+      </a>
+      <a href="#tecnologia">
+        <button class="btn-ghost">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M7 4v3l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Ver tecnologia
+        </button>
+      </a>
+    </div>
+
+    <!-- Color chips -->
+    <div style="display:flex;align-items:center;gap:20px">
+      <span style="font-size:11px;font-weight:600;letter-spacing:2px;color:var(--text2)">CORES:</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#F0F0F0,#C8C8C8);border:2px solid rgba(255,255,255,.3)"></div>
+        <span style="font-size:12px;font-weight:500;color:rgba(255,255,255,.6)">Branco / Preto</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#222,#0A0A0A);border:2px solid rgba(255,255,255,.2)"></div>
+        <span style="font-size:12px;font-weight:500;color:rgba(255,255,255,.6)">Preto / Preto</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.4">
+    <span style="font-size:10px;font-weight:600;letter-spacing:3px;color:#fff">SCROLL</span>
+    <div style="width:1px;height:32px;background:linear-gradient(to bottom,#fff,transparent);animation:float 2s ease-in-out infinite"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ TECNOLOGIA ═══════════════════ -->
+<section id="tecnologia" style="background:var(--bg2);position:relative;overflow:hidden">
+  <!-- Background accent -->
+  <div style="position:absolute;right:-200px;top:50%;transform:translateY(-50%);width:600px;height:600px;background:#00BFFF;border-radius:50%;filter:blur(200px);opacity:.04;pointer-events:none"></div>
+
+  <div class="section-inner" style="max-width:1280px;margin:0 auto;padding:140px 80px">
+
+    <div class="reveal" style="text-align:center;margin-bottom:56px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:3px;color:#00BFFF;margin-bottom:16px">INOVAÇÃO</div>
+      <h2 style="font-size:clamp(36px,4.5vw,58px);font-weight:700;letter-spacing:-2px;line-height:1.05;margin-bottom:20px">
+        Engenharia de precisão.
+      </h2>
+      <p style="font-size:16px;font-weight:300;color:var(--text2);max-width:520px;margin:0 auto;line-height:1.7">
+        Seis componentes integrados, um sistema unificado de IA que se adapta ao seu corpo em tempo real.
+      </p>
+    </div>
+
+    <!-- Exploded view — imagem completa com fade nas bordas -->
+    <div class="reveal" style="position:relative;margin:0 -80px 72px">
+      <img src="uploads/Gemini_Generated_Image_3ebczi3ebczi3ebc.png" alt="LACX — Vista explodida com LED" style="width:100%;display:block" />
+      <!-- Fade topo -->
+      <div style="position:absolute;top:0;left:0;right:0;height:18%;background:linear-gradient(var(--bg2),transparent);pointer-events:none"></div>
+      <!-- Fade base -->
+      <div style="position:absolute;bottom:0;left:0;right:0;height:18%;background:linear-gradient(transparent,var(--bg2));pointer-events:none"></div>
+      <!-- Fade laterais -->
+      <div style="position:absolute;left:0;top:0;bottom:0;width:10%;background:linear-gradient(to right,var(--bg2),transparent);pointer-events:none"></div>
+      <div style="position:absolute;right:0;top:0;bottom:0;width:10%;background:linear-gradient(to left,var(--bg2),transparent);pointer-events:none"></div>
+    </div>
+
+    <!-- 6 Tech cards -->
+    <div class="tech-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:64px">
+
+      <!-- 1. Dial -->
+      <div class="tech-card reveal d1">
+        <div style="width:40px;height:40px;border-radius:50%;border:2px solid rgba(0,191,255,.5);display:flex;align-items:center;justify-content:center;margin-bottom:18px;background:rgba(0,191,255,.06)">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#00BFFF" stroke-width="1.3"/><circle cx="9" cy="9" r="2.5" fill="#00BFFF"/><line x1="9" y1="2" x2="9" y2="5.5" stroke="#00BFFF" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:#00BFFF;margin-bottom:8px">01</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:10px">Dial Inteligente</div>
+        <p style="font-size:13px;font-weight:400;color:var(--text2);line-height:1.65">Ajusta a tensão dos cabos com precisão milimétrica através de um motor silencioso.</p>
+      </div>
+
+      <!-- 2. Kevlar -->
+      <div class="tech-card reveal d2">
+        <div style="width:40px;height:40px;border-radius:50%;border:2px solid rgba(0,191,255,.5);display:flex;align-items:center;justify-content:center;margin-bottom:18px;background:rgba(0,191,255,.06)">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 15 Q9 2 15 15" stroke="#00BFFF" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M5 12 Q9 5 13 12" stroke="rgba(0,191,255,.5)" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+        </div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:#00BFFF;margin-bottom:8px">02</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:10px">Cabos de Kevlar®</div>
+        <p style="font-size:13px;font-weight:400;color:var(--text2);line-height:1.65">Cabos ultra resistentes e leves que se ajustam ao formato único do seu pé.</p>
+      </div>
+
+      <!-- 3. Sensores -->
+      <div class="tech-card reveal d3">
+        <div style="width:40px;height:40px;border-radius:50%;border:2px solid rgba(0,191,255,.5);display:flex;align-items:center;justify-content:center;margin-bottom:18px;background:rgba(0,191,255,.06)">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 9 Q5 5 9 9 Q13 13 16 9" stroke="#00BFFF" stroke-width="1.3" stroke-linecap="round" fill="none"/><circle cx="9" cy="9" r="1.8" fill="#00BFFF"/></svg>
+        </div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:#00BFFF;margin-bottom:8px">03</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:10px">Sensores de Pressão</div>
+        <p style="font-size:13px;font-weight:400;color:var(--text2);line-height:1.65">Detectam o pé e o movimento em tempo real para um ajuste automático e personalizado.</p>
+      </div>
+
+      <!-- 4. Motor -->
+      <div class="tech-card reveal d4">
+        <div style="width:40px;height:40px;border-radius:50%;border:2px solid rgba(0,191,255,.5);display:flex;align-items:center;justify-content:center;margin-bottom:18px;background:rgba(0,191,255,.06)">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="3.5" stroke="#00BFFF" stroke-width="1.3"/><circle cx="9" cy="9" r="7" stroke="rgba(0,191,255,.4)" stroke-width="1" stroke-dasharray="3 2"/></svg>
+        </div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:#00BFFF;margin-bottom:8px">04</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:10px">Motor Silencioso</div>
+        <p style="font-size:13px;font-weight:400;color:var(--text2);line-height:1.65">Compacto, eficiente e de alta durabilidade. Praticamente inaudível durante o uso.</p>
+      </div>
+
+      <!-- 5. Bateria -->
+      <div class="tech-card reveal d5">
+        <div style="width:40px;height:40px;border-radius:50%;border:2px solid rgba(0,191,255,.5);display:flex;align-items:center;justify-content:center;margin-bottom:18px;background:rgba(0,191,255,.06)">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="5" width="13" height="8" rx="1.5" stroke="#00BFFF" stroke-width="1.3"/><path d="M15 8v3" stroke="#00BFFF" stroke-width="1.8" stroke-linecap="round"/><rect x="4" y="7.5" width="7" height="3" rx=".8" fill="#00BFFF"/></svg>
+        </div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:#00BFFF;margin-bottom:8px">05</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:10px">Bateria Recarregável</div>
+        <p style="font-size:13px;font-weight:400;color:var(--text2);line-height:1.65">Até 30 dias com uma carga. Carregamento via USB-C. Indicador LED de status.</p>
+      </div>
+
+      <!-- 6. Sola -->
+      <div class="tech-card reveal d6">
+        <div style="width:40px;height:40px;border-radius:50%;border:2px solid rgba(0,191,255,.5);display:flex;align-items:center;justify-content:center;margin-bottom:18px;background:rgba(0,191,255,.06)">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 13 Q5 10 9 12 Q13 14 16 11" stroke="#00BFFF" stroke-width="1.3" stroke-linecap="round" fill="none"/><rect x="5" y="13.5" width="8" height="2.5" rx="1.25" fill="rgba(0,191,255,.4)"/></svg>
+        </div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:#00BFFF;margin-bottom:8px">06</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:10px">Sola Inteligente</div>
+        <p style="font-size:13px;font-weight:400;color:var(--text2);line-height:1.65">Amortecimento responsivo e LEDs de status que indicam o nível de ajuste e bateria.</p>
+      </div>
+    </div>
+
+    <!-- IA Adaptativa highlight -->
+    <div class="reveal" style="border:1px solid rgba(0,191,255,.25);border-radius:10px;padding:36px 40px;background:rgba(0,191,255,.04);display:flex;align-items:center;gap:48px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:16px;flex-shrink:0">
+        <div style="width:52px;height:52px;border-radius:50%;background:#00BFFF;display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(0,191,255,.4)">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3 L19 8 L19 14 L11 19 L3 14 L3 8 Z" stroke="#000" stroke-width="1.5"/><circle cx="11" cy="11" r="2.5" fill="#000"/><line x1="11" y1="6" x2="11" y2="8.5" stroke="#000" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="13.5" x2="11" y2="16" stroke="#000" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:2.5px;color:#00BFFF;margin-bottom:4px">EXCLUSIVO</div>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-.5px">IA Adaptativa</div>
+        </div>
+      </div>
+      <p style="font-size:15px;font-weight:300;color:rgba(255,255,255,.65);line-height:1.7;max-width:520px">
+        O sistema aprende com seu jeito de andar e se ajusta automaticamente para o máximo conforto e performance. A cada uso, o LACX fica mais seu.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ COMO FUNCIONA ═══════════════════ -->
+<section id="como-funciona" style="background:var(--bg);position:relative;overflow:hidden">
+  <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:800px;height:300px;background:#00BFFF;border-radius:50%;filter:blur(240px);opacity:.04;pointer-events:none"></div>
+
+  <div class="section-inner" style="max-width:1280px;margin:0 auto;padding:140px 80px">
+
+    <div class="reveal" style="text-align:center;margin-bottom:88px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:3px;color:#00BFFF;margin-bottom:16px">PROCESSO</div>
+      <h2 style="font-size:clamp(36px,4.5vw,58px);font-weight:700;letter-spacing:-2px;line-height:1.05;margin-bottom:16px">
+        Simples como calçar.
+      </h2>
+      <p style="font-size:16px;font-weight:300;color:var(--text2);max-width:440px;margin:0 auto;line-height:1.7">
+        Quatro passos. Zero esforço. Ajuste automático perfeito.
+      </p>
+    </div>
+
+    <!-- Steps row -->
+    <div class="steps-row" style="display:flex;align-items:flex-start;gap:0;position:relative">
+
+      <!-- Connecting line -->
+      <div class="step-connector" style="position:absolute;top:36px;left:calc(12.5% + 20px);right:calc(12.5% + 20px);height:1px;background:linear-gradient(to right,rgba(0,191,255,.15),rgba(0,191,255,.4),rgba(0,191,255,.4),rgba(0,191,255,.15))"></div>
+
+      <!-- Step 1 -->
+      <div class="reveal d1" style="flex:1;text-align:center;padding:0 20px">
+        <div style="display:flex;justify-content:center;margin-bottom:20px">
+          <div style="width:72px;height:72px;border-radius:50%;border:1.5px solid rgba(0,191,255,.4);background:rgba(0,191,255,.06);display:flex;align-items:center;justify-content:center;position:relative;z-index:1;flex-shrink:0">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M10 4 Q6 7 6 14 Q6 22 14 24 Q22 22 22 14 Q22 7 18 4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M10 4 Q14 2 18 4" stroke="rgba(255,255,255,.8)" stroke-width="1.5" stroke-linecap="round"/><circle cx="14" cy="14" r="3" fill="rgba(0,191,255,.7)"/></svg>
+          </div>
+        </div>
+        <div class="step-num" style="margin-bottom:14px">01</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:8px">Calça o pé</div>
+        <p style="font-size:13px;font-weight:400;color:var(--text2);line-height:1.6">Vista normalmente. Os sensores ativam automaticamente ao detectar seu pé.</p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="reveal d2" style="flex:1;text-align:center;padding:0 20px">
+        <div style="display:flex;justify-content:center;margin-bottom:20px">
+          <div style="width:72px;height:72px;border-radius:50%;border:1.5px solid rgba(0,191,255,.4);background:rgba(0,191,255,.06);display:flex;align-items:center;justify-content:center;position:relative;z-index:1">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="8" stroke="rgba(0,191,255,.8)" stroke-width="1.3" stroke-dasharray="4 3"/><path d="M9 14 Q11 10 14 14 Q17 18 19 14" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+          </div>
+        </div>
+        <div class="step-num" style="margin-bottom:14px">02</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:8px">Sensores escaneiam</div>
+        <p style="font-size:13px;font-weight:400;color:var(--text2);line-height:1.6">Pressão, formato e movimento são mapeados com precisão milimétrica em milissegundos.</p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="reveal d3" style="flex:1;text-align:center;padding:0 20px">
+        <div style="display:flex;justify-content:center;margin-bottom:20px">
+          <div style="width:72px;height:72px;border-radius:50%;border:1.5px solid rgba(0,191,255,.4);background:rgba(0,191,255,.06);display:flex;align-items:center;justify-content:center;position:relative;z-index:1">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="5" stroke="#00BFFF" stroke-width="1.5"/><circle cx="14" cy="14" r="9" stroke="rgba(0,191,255,.3)" stroke-width="1" stroke-dasharray="5 3"/><path d="M14 9 L14 5" stroke="#00BFFF" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="step-num" style="margin-bottom:14px">03</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:8px">Motor ajusta</div>
+        <p style="font-size:13px;font-weight:400;color:var(--text2);line-height:1.6">O motor silencioso tensiona os cabos de Kevlar® ao ponto exato para o seu conforto.</p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="reveal d4" style="flex:1;text-align:center;padding:0 20px">
+        <div style="display:flex;justify-content:center;margin-bottom:20px">
+          <div style="width:72px;height:72px;border-radius:50%;border:1.5px solid #00BFFF;background:rgba(0,191,255,.1);display:flex;align-items:center;justify-content:center;position:relative;z-index:1;box-shadow:0 0 24px rgba(0,191,255,.25)">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14 L11.5 20 L22 8" stroke="#00BFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <div class="step-num" style="margin-bottom:14px">04</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:8px;color:#00BFFF">Ajuste perfeito</div>
+        <p style="font-size:13px;font-weight:400;color:var(--text2);line-height:1.6">Conforto e performance automáticos. Pronto para ir mais longe.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ ECOSYSTEM BANNER ═══════════════════ -->
+<section style="background:#0A0A0A;padding:0;overflow:hidden;position:relative;line-height:0">
+  <img src="uploads/Gemini_Generated_Image_u1f4mxu1f4mxu1f4.png" alt="LACX — Tênis, App e Tecnologia" style="width:100%;display:block;max-height:65vh;object-fit:cover;object-position:center 35%" />
+  <div style="position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(transparent,#0F0F0F);pointer-events:none"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:20%;background:linear-gradient(#0A0A0A,transparent);pointer-events:none"></div>
+</section>
+
+<!-- ═══════════════════ APP LACX ═══════════════════ -->
+<section id="app" style="background:var(--bg2);position:relative;overflow:hidden">
+  <div style="position:absolute;left:-100px;top:50%;transform:translateY(-50%);width:500px;height:500px;background:#00BFFF;border-radius:50%;filter:blur(220px);opacity:.05;pointer-events:none"></div>
+
+  <div class="section-inner" style="max-width:1280px;margin:0 auto;padding:140px 80px">
+    <div class="app-cols" style="display:flex;align-items:center;gap:80px">
+
+      <!-- Phone mockup — real app screenshot -->
+      <div class="reveal" style="flex-shrink:0;position:relative">
+        <div style="position:absolute;inset:-40px;background:radial-gradient(ellipse at 50% 60%,rgba(0,191,255,.12) 0%,transparent 65%);pointer-events:none"></div>
+        <img src="uploads/tenis-app.jpg" alt="LACX App" style="width:300px;display:block;border-radius:48px;box-shadow:0 40px 100px rgba(0,0,0,.8),0 0 50px rgba(0,191,255,.12);position:relative;z-index:1" />
+      </div>
+
+      <!-- Features list -->
+      <div style="flex:1">
+        <div class="reveal" style="margin-bottom:48px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:3px;color:#00BFFF;margin-bottom:16px">CONECTIVIDADE</div>
+          <h2 style="font-size:clamp(34px,4vw,52px);font-weight:700;letter-spacing:-2px;line-height:1.08;margin-bottom:16px">
+            Controle total na<br>palma da mão.
+          </h2>
+          <p style="font-size:15px;font-weight:300;color:var(--text2);line-height:1.7;max-width:420px">
+            O app LACX é o centro de comando do seu tênis. Mais tecnologia, mais personalização, mais controle.
+          </p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:48px">
+          <div class="reveal d1" style="display:flex;align-items:flex-start;gap:18px;padding:20px 0;border-bottom:1px solid var(--border)">
+            <div style="width:36px;height:36px;border-radius:8px;background:var(--accent-dim);border:1px solid rgba(0,191,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="#00BFFF" stroke-width="1.2"/><circle cx="8" cy="8" r="2" fill="#00BFFF"/></svg>
+            </div>
+            <div>
+              <div style="font-size:15px;font-weight:600;margin-bottom:4px">Ajuste Personalizado</div>
+              <p style="font-size:13px;color:var(--text2);line-height:1.55">Controle a pressão ideal para você e salve seus perfis favoritos.</p>
+            </div>
+          </div>
+          <div class="reveal d2" style="display:flex;align-items:flex-start;gap:18px;padding:20px 0;border-bottom:1px solid var(--border)">
+            <div style="width:36px;height:36px;border-radius:8px;background:var(--accent-dim);border:1px solid rgba(0,191,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 12 L8 4 L13 12" stroke="#00BFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-size:15px;font-weight:600;margin-bottom:4px">Modo Corrida / Casual</div>
+              <p style="font-size:13px;color:var(--text2);line-height:1.55">Perfis de ajuste otimizados para cada momento do seu dia.</p>
+            </div>
+          </div>
+          <div class="reveal d3" style="display:flex;align-items:flex-start;gap:18px;padding:20px 0;border-bottom:1px solid var(--border)">
+            <div style="width:36px;height:36px;border-radius:8px;background:var(--accent-dim);border:1px solid rgba(0,191,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="10" height="6" rx="1" stroke="#00BFFF" stroke-width="1.2"/><path d="M12 7.5v1" stroke="#00BFFF" stroke-width="1.8" stroke-linecap="round"/><rect x="3.5" y="6.5" width="5" height="3" rx=".5" fill="#00BFFF"/></svg>
+            </div>
+            <div>
+              <div style="font-size:15px;font-weight:600;margin-bottom:4px">Monitor de Bateria</div>
+              <p style="font-size:13px;color:var(--text2);line-height:1.55">Acompanhe o nível em tempo real e receba alertas antes de zerar.</p>
+            </div>
+          </div>
+          <div class="reveal d4" style="display:flex;align-items:flex-start;gap:18px;padding:20px 0;border-bottom:1px solid var(--border)">
+            <div style="width:36px;height:36px;border-radius:8px;background:var(--accent-dim);border:1px solid rgba(0,191,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#00BFFF" stroke-width="1.2"/><path d="M5 10 L6.5 8 L8 10 L10 6 L12 9" stroke="#00BFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-size:15px;font-weight:600;margin-bottom:4px">Estatísticas de Performance</div>
+              <p style="font-size:13px;color:var(--text2);line-height:1.55">Passos, distância, calorias e tempo de uso detalhados por sessão.</p>
+            </div>
+          </div>
+          <div class="reveal d5" style="display:flex;align-items:flex-start;gap:18px;padding:20px 0">
+            <div style="width:36px;height:36px;border-radius:8px;background:var(--accent-dim);border:1px solid rgba(0,191,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2 L14 5 L14 9 Q14 13 8 15 Q2 13 2 9 L2 5 Z" stroke="#00BFFF" stroke-width="1.2"/><path d="M5 8 L7 10 L11 6" stroke="#00BFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-size:15px;font-weight:600;margin-bottom:4px">Atualizações OTA</div>
+              <p style="font-size:13px;color:var(--text2);line-height:1.55">Novos perfis e melhorias chegam direto no tênis via app, sem cabos.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- App badges -->
+        <div class="reveal" style="display:flex;gap:12px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 20px;border:1px solid var(--border2);border-radius:10px;background:var(--bg3)">
+            <svg width="20" height="24" viewBox="0 0 20 24" fill="white"><path d="M17.1 12.8c0-3.2 2.6-4.7 2.7-4.8-1.5-2.1-3.7-2.4-4.5-2.4-1.9-.2-3.8 1.1-4.7 1.1-.9 0-2.4-1.1-4-1.1-2 0-3.9 1.2-5 3-.2.4-2.1 6.3-.4 9.4 1.7 2.9 3.3 2.9 3.3 2.9s1.3-1.1 3.1-.2c0 0 1.5 1 3.1.3 1.6-.8 2.9-2.3 3.1-2.3.1 0 2.7-.5 4.1-3.2 0 0-.9-.5-1.8-2.7z"/><path d="M13.4 2.3c.8-1 1.4-2.3 1.2-3.6-1.2.1-2.6.8-3.5 1.8-.8.9-1.5 2.3-1.3 3.7 1.3.1 2.7-.7 3.6-1.9z"/></svg>
+            <div>
+              <div style="font-size:9px;color:var(--text2);letter-spacing:.5px">DISPONÍVEL NA</div>
+              <div style="font-size:13px;font-weight:600">App Store</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 20px;border:1px solid var(--border2);border-radius:10px;background:var(--bg3)">
+            <svg width="20" height="22" viewBox="0 0 20 22" fill="none"><path d="M1 1.5 L10 11 L1 20.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M1 1.5 L17 8 L10 11" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 20.5 L17 14 L10 11" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div>
+              <div style="font-size:9px;color:var(--text2);letter-spacing:.5px">DISPONÍVEL NO</div>
+              <div style="font-size:13px;font-weight:600">Google Play</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ PERFORMANCE ═══════════════════ -->
+<section id="performance" style="background:var(--bg);position:relative;overflow:hidden">
+  <div style="position:absolute;right:-100px;bottom:-100px;width:600px;height:400px;background:#00BFFF;border-radius:50%;filter:blur(220px);opacity:.04;pointer-events:none"></div>
+
+  <div class="section-inner" style="max-width:1280px;margin:0 auto;padding:140px 80px">
+
+    <div class="reveal" style="text-align:center;margin-bottom:80px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:3px;color:#00BFFF;margin-bottom:16px">RESULTADOS</div>
+      <h2 style="font-size:clamp(36px,4.5vw,58px);font-weight:700;letter-spacing:-2px;line-height:1.05;margin-bottom:16px">
+        Feito para ir mais longe.
+      </h2>
+      <p style="font-size:16px;font-weight:300;color:var(--text2);max-width:440px;margin:0 auto;line-height:1.7">
+        Desenvolvido para atletas, urbanos e para todos que buscam o melhor de cada passo.
+      </p>
+    </div>
+
+    <!-- 4 benefit cards -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:60px">
+      <div class="perf-card reveal d1">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+          <div style="width:44px;height:44px;border-radius:50%;background:var(--accent-dim);border:1px solid rgba(0,191,255,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3 L10 17M3 10 L17 10" stroke="#00BFFF" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="10" r="6" stroke="rgba(0,191,255,.4)" stroke-width="1"/></svg>
+          </div>
+          <div style="font-size:19px;font-weight:700;letter-spacing:-.3px">Mais Estabilidade</div>
+        </div>
+        <p style="font-size:14px;font-weight:400;color:var(--text2);line-height:1.65">Ajuste firme e preciso que elimina movimentos indesejados e dá segurança real em cada passo, sprint ou curva.</p>
+      </div>
+
+      <div class="perf-card reveal d2">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+          <div style="width:44px;height:44px;border-radius:50%;background:var(--accent-dim);border:1px solid rgba(0,191,255,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 15 Q8 8 10 10 Q12 12 15 5" stroke="#00BFFF" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="10" cy="17" r="2" fill="rgba(0,191,255,.4)"/></svg>
+          </div>
+          <div style="font-size:19px;font-weight:700;letter-spacing:-.3px">Maior Conforto</div>
+        </div>
+        <p style="font-size:14px;font-weight:400;color:var(--text2);line-height:1.65">Amortecimento responsivo e inteligente que reduz impactos e distribui a pressão de forma uniforme.</p>
+      </div>
+
+      <div class="perf-card reveal d3">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+          <div style="width:44px;height:44px;border-radius:50%;background:var(--accent-dim);border:1px solid rgba(0,191,255,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 10 L8 12 L14 6" stroke="#00BFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="10" r="7.5" stroke="rgba(0,191,255,.35)" stroke-width="1"/></svg>
+          </div>
+          <div style="font-size:19px;font-weight:700;letter-spacing:-.3px">Redução de Lesões</div>
+        </div>
+        <p style="font-size:14px;font-weight:400;color:var(--text2);line-height:1.65">Ajuste personalizado que diminui atrito, pontos de pressão e o risco de lesões por uso prolongado.</p>
+      </div>
+
+      <div class="perf-card reveal d4">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+          <div style="width:44px;height:44px;border-radius:50%;background:var(--accent-dim);border:1px solid rgba(0,191,255,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16 L10 4 L16 16" stroke="#00BFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 12 L13 12" stroke="#00BFFF" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div style="font-size:19px;font-weight:700;letter-spacing:-.3px">Desempenho Superior</div>
+        </div>
+        <p style="font-size:14px;font-weight:400;color:var(--text2);line-height:1.65">Mais energia, mais segurança e mais performance em cada sessão. Do treino à competição.</p>
+      </div>
+    </div>
+
+    <!-- Ideal para -->
+    <div class="reveal" style="text-align:center">
+      <div style="font-size:11px;font-weight:600;letter-spacing:3px;color:var(--text2);margin-bottom:20px">IDEAL PARA</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <div class="chip">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 11 L5 4 L7 8 L9 6 L11 11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Corrida
+        </div>
+        <div class="chip">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 10 Q7 4 10 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="4" y1="10" x2="10" y2="10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Treino
+        </div>
+        <div class="chip">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 13 Q3 9 7 9 Q11 9 11 13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Dia a dia
+        </div>
+        <div class="chip">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 12 L5 7 L7 9 L9 5 L12 12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Trilhas leves
+        </div>
+        <div class="chip">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 5 L5 3.5 Q5 2 7 2 Q9 2 9 3.5 L9 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Viagens
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ COMPRAR ═══════════════════ -->
+<section id="comprar" style="background:var(--bg2);position:relative;overflow:hidden">
+  <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:700px;height:400px;background:#00BFFF;border-radius:50%;filter:blur(240px);opacity:.06;pointer-events:none"></div>
+
+  <div class="section-inner" style="max-width:1280px;margin:0 auto;padding:140px 80px">
+
+    <!-- Price header -->
+    <div class="reveal" style="text-align:center;margin-bottom:80px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:3px;color:#00BFFF;margin-bottom:16px">PRÉ-VENDA EXCLUSIVA</div>
+      <h2 style="font-size:clamp(36px,4.5vw,58px);font-weight:700;letter-spacing:-2px;line-height:1.05;margin-bottom:32px">
+        Seu próximo passo.
+      </h2>
+      <div style="display:inline-block;padding:32px 64px;border:1px solid rgba(0,191,255,.3);border-radius:12px;background:rgba(0,191,255,.04)">
+        <div style="font-size:12px;font-weight:600;letter-spacing:2px;color:var(--text2);margin-bottom:8px">PREÇO LANÇAMENTO</div>
+        <div style="font-size:clamp(44px,6vw,72px);font-weight:700;letter-spacing:-3px;line-height:1">R$&nbsp;1.299<span style="font-size:.45em;color:var(--text2);letter-spacing:0;font-weight:400">,00</span></div>
+        <div style="font-size:12px;color:var(--text2);margin-top:8px">em até 12x sem juros</div>
+      </div>
+    </div>
+
+    <!-- Model cards -->
+    <div class="models-row" style="display:flex;gap:24px;margin-bottom:48px">
+      <!-- White model -->
+      <div class="model-card mc-active reveal d1" id="model-branco" style="flex:1;cursor:pointer" onclick="document.querySelectorAll('.model-card').forEach(c=>c.classList.remove('mc-active'));this.classList.add('mc-active')">
+        <div style="height:240px;background:#0E0E0E;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;position:relative;overflow:hidden">
+          <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 80%,rgba(0,191,255,.08) 0%,transparent 65%);pointer-events:none"></div>
+          <img src="uploads/tenis-white%20copy.png" alt="LACX Branco / Preto" style="width:92%;height:100%;object-fit:contain;object-position:center;filter:drop-shadow(0 20px 48px rgba(0,0,0,.65))" />
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:17px;font-weight:700;letter-spacing:-.3px">Branco / Preto</div>
+          <div style="width:22px;height:22px;border-radius:50%;border:2px solid #00BFFF;display:flex;align-items:center;justify-content:center">
+            <div id="check-branco" style="width:10px;height:10px;border-radius:50%;background:#00BFFF"></div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:var(--text2)">Edição lançamento — disponibilidade limitada</div>
+      </div>
+
+      <!-- Black model -->
+      <div class="model-card reveal d2" id="model-preto" style="flex:1;cursor:pointer" onclick="document.querySelectorAll('.model-card').forEach(c=>c.classList.remove('mc-active'));this.classList.add('mc-active')">
+        <div style="height:240px;background:#0A0A0A;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;position:relative;overflow:hidden">
+          <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 80%,rgba(0,191,255,.06) 0%,transparent 65%);pointer-events:none"></div>
+          <img src="uploads/tenis-black%20copy.png" alt="LACX Preto / Preto" style="width:92%;height:100%;object-fit:contain;object-position:center;filter:drop-shadow(0 20px 48px rgba(0,0,0,.8))" />
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:17px;font-weight:700;letter-spacing:-.3px">Preto / Preto</div>
+          <div style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center">
+            <div style="width:10px;height:10px;border-radius:50%;background:transparent"></div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:var(--text2)">Clássico futurista — disponibilidade limitada</div>
+      </div>
+    </div>
+
+    <!-- Size selector -->
+    <div class="reveal" style="margin-bottom:48px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:var(--text2);margin-bottom:16px">SELECIONE SUA NUMERAÇÃO</div>
+      <div id="size-grid" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="size-btn" onclick="document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('sz-active'));this.classList.add('sz-active')">37</button>
+        <button class="size-btn" onclick="document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('sz-active'));this.classList.add('sz-active')">38</button>
+        <button class="size-btn" onclick="document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('sz-active'));this.classList.add('sz-active')">39</button>
+        <button class="size-btn" onclick="document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('sz-active'));this.classList.add('sz-active')">40</button>
+        <button class="size-btn" onclick="document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('sz-active'));this.classList.add('sz-active')">41</button>
+        <button class="size-btn" onclick="document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('sz-active'));this.classList.add('sz-active')">42</button>
+        <button class="size-btn" onclick="document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('sz-active'));this.classList.add('sz-active')">43</button>
+        <button class="size-btn" onclick="document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('sz-active'));this.classList.add('sz-active')">44</button>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="reveal" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px">
+      <div class="badge-pill">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 7 L6.5 9 L10 5" stroke="rgba(0,191,255,.7)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="7" r="5.5" stroke="rgba(0,191,255,.35)" stroke-width="1"/></svg>
+        Garantia 1 ano
+      </div>
+      <div class="badge-pill">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 5 L7 3 L12 5 L12 9 Q12 12 7 13 Q2 12 2 9 Z" stroke="rgba(0,191,255,.5)" stroke-width="1" fill="none"/></svg>
+        Envio para todo o Brasil
+      </div>
+      <div class="badge-pill">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="rgba(0,191,255,.5)" stroke-width="1"/><path d="M7 4 L7 7 L9.5 7" stroke="rgba(0,191,255,.7)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Pré-venda exclusiva
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="reveal" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <button class="btn-cta" style="padding:18px 48px;font-size:14px;letter-spacing:2px">
+        Comprar agora →
+      </button>
+      <p style="font-size:13px;color:var(--text2)">
+        Entrega prevista para o 4º trimestre de 2025
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer style="background:var(--bg);border-top:1px solid var(--border);padding:80px 80px 60px">
+  <div style="max-width:1280px;margin:0 auto">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:40px;margin-bottom:60px">
+
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><path d="M4 3 L20 19.5 L36 3 L40 7 L24.5 20.5 L40 37 L36 40 L20 23 L4 40 L0 37 L15.5 20.5 L0 7 Z" fill="white"/></svg>
+          <span style="font-size:18px;font-weight:700;letter-spacing:4px">LACX</span>
+        </div>
+        <p style="font-size:14px;font-weight:300;color:var(--text2);line-height:1.65;max-width:280px">
+          O futuro se ajusta a você.<br>O primeiro tênis com sistema de amarração automática adaptativa.
+        </p>
+      </div>
+
+      <div style="display:flex;gap:60px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:2.5px;color:var(--text2);margin-bottom:20px">PRODUTO</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <a href="#tecnologia" style="font-size:14px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.6)'">Tecnologia</a>
+            <a href="#como-funciona" style="font-size:14px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.6)'">Como Funciona</a>
+            <a href="#app" style="font-size:14px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.6)'">App LACX</a>
+            <a href="#comprar" style="font-size:14px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.6)'">Pré-venda</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:2.5px;color:var(--text2);margin-bottom:20px">SOCIAL</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <a href="https://instagram.com/lacx.oficial" target="_blank" style="font-size:14px;color:rgba(255,255,255,.6);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.6)'">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="3" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r="3" stroke="currentColor" stroke-width="1.2"/><circle cx="10.5" cy="3.5" r="1" fill="currentColor"/></svg>
+              @lacx.oficial
+            </a>
+            <a href="https://tiktok.com/@lacx.oficial" target="_blank" style="font-size:14px;color:rgba(255,255,255,.6);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.6)'">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 1 Q9 5 12.5 6 L12.5 8.5 Q10 8.5 8.5 7 L8.5 10.5 Q8.5 13 6 13 Q3.5 13 3.5 10.5 Q3.5 8 6 8 L6 10.5 Q5 10.5 5 10.5 Q4.5 10.5 4.5 11 Q4.5 11.5 6 11.5 Q7 11.5 7 10.5 L7 1 Z" stroke="currentColor" stroke-width="1" fill="none" stroke-linejoin="round"/></svg>
+              @lacx.oficial
+            </a>
+            <a href="https://lacx.com.br" target="_blank" style="font-size:14px;color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.6)'">LACX.COM.BR</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding-top:28px;border-top:1px solid var(--border);flex-wrap:wrap;gap:12px">
+      <p style="font-size:12px;color:var(--text3)">© 2025 LACX. Todos os direitos reservados.</p>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:6px;height:6px;border-radius:50%;background:#00BFFF;box-shadow:0 0 8px #00BFFF;animation:ledBlink 4s ease-in-out infinite"></div>
+        <span style="font-size:12px;font-weight:500;color:var(--text3);letter-spacing:1px">O FUTURO SE AJUSTA A VOCÊ.</span>
+      </div>
+    </div>
+  </div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() {
+    // Nav scroll behavior
+    const nav = document.getElementById('lacx-nav');
+    const onScroll = () => {
+      if (window.scrollY > 60) {
+        nav.classList.add('nav-solid');
+      } else {
+        nav.classList.remove('nav-solid');
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    this._cleanupScroll = () => window.removeEventListener('scroll', onScroll);
+
+    // Intersection Observer — scroll reveals
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.05, rootMargin: '0px 0px 0px 0px' }
+    );
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+    this._observer = observer;
+
+    // Immediately reveal anything already in viewport
+    setTimeout(() => {
+      document.querySelectorAll('.reveal:not(.visible)').forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight) {
+          el.classList.add('visible');
+        }
+      });
+    }, 100);
+  }
+
+  componentWillUnmount() {
+    this._cleanupScroll && this._cleanupScroll();
+    this._observer && this._observer.disconnect();
+  }
+
+  renderVals() {
+    return {};
+  }
+}
+
+</script>
+</body>
+</html>
