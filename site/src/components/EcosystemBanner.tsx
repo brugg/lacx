@@ -20,6 +20,7 @@ export default function EcosystemBanner() {
     };
 
     const onScroll = () => {
+      if (window.innerWidth < 768) return;
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => { apply(); ticking = false; });

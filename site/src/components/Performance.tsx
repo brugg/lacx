@@ -93,6 +93,7 @@ export default function Performance() {
 
         {/* Benefit cards */}
         <div
+          className="perf-grid"
           style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "16px", marginBottom: "60px" }}
         >
           {benefits.map((b, i) => (
@@ -189,7 +190,7 @@ export default function Performance() {
       <style>{`
         @media (max-width: 768px) {
           .section-inner { padding: 80px 24px !important; }
-          [style*="grid-template-columns: repeat(2,1fr)"] { grid-template-columns: 1fr !important; }
+          .perf-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>

@@ -83,6 +83,7 @@ export default function Tecnologia() {
   useEffect(() => {
     let ticking = false;
     const onScroll = () => {
+      if (window.innerWidth < 768) return;
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
@@ -153,7 +154,7 @@ export default function Tecnologia() {
         </div>
 
         {/* Exploded view image */}
-        <div ref={explodedRef} className="reveal" style={{ position: "relative", margin: "0 -80px 72px", willChange: "transform" }}>
+        <div ref={explodedRef} className="reveal exploded-wrap" style={{ position: "relative", margin: "0 -80px 72px", willChange: "transform" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/uploads/Gemini_Generated_Image_3ebczi3ebczi3ebc.png"
@@ -275,6 +276,8 @@ export default function Tecnologia() {
         @media (max-width: 768px) {
           .tech-grid { grid-template-columns: 1fr !important; }
           .section-inner { padding: 80px 24px !important; }
+          /* Exploded image: cancel the negative margin bleed on mobile */
+          .exploded-wrap { margin: 0 0 48px !important; }
         }
       `}</style>
     </section>

@@ -13,18 +13,15 @@ export default function Hero() {
     let ticking = false;
 
     const onScroll = () => {
+      if (window.innerWidth < 768) return;
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
         const y = window.scrollY;
-        // Shoe panel drifts up faster than page — creates depth
         if (shoeRef.current) shoeRef.current.style.transform = `translateY(${y * 0.35}px)`;
-        // Orbs drift at different rates for multi-layer depth
         if (orb1Ref.current) orb1Ref.current.style.transform = `translateY(${y * 0.18}px)`;
         if (orb2Ref.current) orb2Ref.current.style.transform = `translateY(${y * 0.08}px)`;
-        // Grid drifts slowly — subtle background motion
         if (gridRef.current) gridRef.current.style.transform = `translateY(${y * 0.05}px)`;
-        // Hero text drifts up slightly — stays readable longer
         if (textRef.current) textRef.current.style.transform = `translateY(${y * 0.12}px)`;
         ticking = false;
       });
@@ -102,6 +99,7 @@ export default function Hero() {
       {/* Shoe image panel — fastest layer, most foreground-like */}
       <div
         ref={shoeRef}
+        className="shoe-panel"
         style={{
           position: "absolute",
           right: 0,
@@ -432,8 +430,14 @@ export default function Hero() {
       <style>{`
         @media (max-width: 768px) {
           .hero-text {
-            padding: 100px 24px 0 !important;
+            padding: 100px 24px 40px !important;
             max-width: 100% !important;
+            z-index: 3 !important;
+          }
+          /* On mobile the shoe becomes a full-bleed background with heavy fade */
+          .shoe-panel {
+            width: 100% !important;
+            opacity: 0.35 !important;
           }
         }
       `}</style>

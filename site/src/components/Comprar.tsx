@@ -65,6 +65,7 @@ export default function Comprar() {
             Seu próximo passo.
           </h2>
           <div
+            className="price-box"
             style={{
               display: "inline-block",
               padding: "32px 64px",
@@ -287,6 +288,7 @@ export default function Comprar() {
         @media (max-width: 768px) {
           .models-row { flex-direction: column !important; }
           .section-inner { padding: 80px 24px !important; }
+          .price-box { padding: 24px 28px !important; }
         }
       `}</style>
     </section>

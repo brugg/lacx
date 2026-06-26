@@ -64,6 +64,7 @@ export default function AppLacx() {
   useEffect(() => {
     let ticking = false;
     const onScroll = () => {
+      if (window.innerWidth < 768) return;
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
@@ -121,6 +122,7 @@ export default function AppLacx() {
             <img
               src="/uploads/tenis-app.jpg"
               alt="LACX App"
+              className="phone-img"
               style={{
                 width: "300px",
                 display: "block",
@@ -233,8 +235,9 @@ export default function AppLacx() {
 
       <style>{`
         @media (max-width: 768px) {
-          .app-cols { flex-direction: column !important; align-items: center !important; }
+          .app-cols { flex-direction: column !important; align-items: center !important; gap: 40px !important; }
           .section-inner { padding: 80px 24px !important; }
+          .phone-img { width: min(260px, 70vw) !important; border-radius: 32px !important; }
         }
       `}</style>
     </section>
